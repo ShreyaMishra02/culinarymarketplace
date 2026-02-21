@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/context/CartContext";
+import { useCart, getCartItemKey } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -88,16 +88,21 @@ const CheckoutPage = () => {
           <div>
             <h2 className="text-lg font-semibold mb-4">Review Your Order</h2>
             <div className="space-y-3 mb-4">
-              {items.map(({ product, quantity }) => (
-                <div key={product.id} className="flex items-center gap-3 text-sm">
-                  <img src={product.image} alt={product.name} className="h-12 w-12 rounded object-cover" />
-                  <div className="flex-1">
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-muted-foreground">Qty: {quantity}</p>
+              {items.map((item) => {
+                const key = getCartItemKey(item);
+                const pts = item.selectedOption ? item.selectedOption.points : item.product.points;
+                return (
+                  <div key={key} className="flex items-center gap-3 text-sm">
+                    <img src={item.product.image} alt={item.product.name} className="h-12 w-12 rounded object-cover" />
+                    <div className="flex-1">
+                      <p className="font-medium">{item.product.name}</p>
+                      {item.selectedOption && <p className="text-xs text-primary">{item.selectedOption.title}</p>}
+                      <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                    </div>
+                    <span className="font-medium text-primary">{(pts * item.quantity).toLocaleString()} pts</span>
                   </div>
-                  <span className="font-medium text-primary">{(product.points * quantity).toLocaleString()} pts</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="border-t pt-3 text-sm">
               <div className="flex justify-between font-semibold mb-3">
