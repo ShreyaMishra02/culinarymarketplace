@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import { categories, products } from "@/data/mockData";
 import heroBanner from "@/assets/hero-banner.jpg";
 
+const visibleCategories = categories.filter(c => !c.hidden);
 const popularProducts = products.filter(p => p.badges.includes("top")).slice(0, 6);
 
 const Index = () => (
@@ -37,7 +38,7 @@ const Index = () => (
     <section className="container-main py-12 sm:py-16">
       <h2 className="text-2xl font-semibold text-foreground mb-6">Browse Categories</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        {categories.map(c => (
+        {visibleCategories.map(c => (
           <CategoryCard key={c.id} category={c} />
         ))}
       </div>

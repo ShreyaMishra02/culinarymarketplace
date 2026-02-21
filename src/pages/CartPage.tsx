@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import { useCart } from "@/context/CartContext";
+import { useCart, getCartItemKey } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 
 const CartPage = () => {
@@ -24,47 +24,57 @@ const CartPage = () => {
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          {items.map(({ product, quantity }) => (
-            <div key={product.id} className="bg-card border rounded-lg p-4 flex gap-4">
-              <img src={product.image} alt={product.name} className="h-24 w-24 rounded-md object-cover shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground font-medium uppercase">{product.brand}</p>
-                <h3 className="text-sm font-medium text-card-foreground">{product.name}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Code: {product.productCode}</p>
-                <p className="text-xs text-muted-foreground">{product.deliveryInfo}</p>
+          {items.map((item) => {
+            const key = getCartItemKey(item);
+            const itemPoints = item.selectedOption ? item.selectedOption.points : item.product.points;
+            return (
+              <div key={key} className="bg-card border rounded-lg p-4 flex gap-4">
+                <img src={item.product.image} alt={item.product.name} className="h-24 w-24 rounded-md object-cover shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted-foreground font-medium uppercase">{item.product.brand}</p>
+                  <h3 className="text-sm font-medium text-card-foreground">{item.product.name}</h3>
+                  {item.selectedOption && (
+                    <p className="text-xs text-primary font-medium mt-0.5">{item.selectedOption.title}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-0.5">Code: {item.product.productCode}</p>
+                  <p className="text-xs text-muted-foreground">{item.product.deliveryInfo}</p>
+                  {item.selectedDate && (
+                    <p className="text-xs text-muted-foreground">Date: {item.selectedDate}</p>
+                  )}
 
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center border rounded-md">
-                    <button
-                      onClick={() => updateQuantity(product.id, quantity - 1)}
-                      className="p-1.5 hover:bg-accent transition-colors"
-                    >
-                      <Minus className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="px-3 text-sm font-medium">{quantity}</span>
-                    <button
-                      onClick={() => {
-                        const newTotal = totalPoints + product.points;
-                        if (newTotal > userPoints) return;
-                        updateQuantity(product.id, quantity + 1);
-                      }}
-                      className="p-1.5 hover:bg-accent transition-colors"
-                      title={totalPoints + product.points > userPoints ? "Insufficient points" : ""}
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center border rounded-md">
+                      <button
+                        onClick={() => updateQuantity(key, item.quantity - 1)}
+                        className="p-1.5 hover:bg-accent transition-colors"
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="px-3 text-sm font-medium">{item.quantity}</span>
+                      <button
+                        onClick={() => {
+                          const newTotal = totalPoints + itemPoints;
+                          if (newTotal > userPoints) return;
+                          updateQuantity(key, item.quantity + 1);
+                        }}
+                        className="p-1.5 hover:bg-accent transition-colors"
+                        title={totalPoints + itemPoints > userPoints ? "Insufficient points" : ""}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-primary text-sm">{(product.points * quantity).toLocaleString()} pts</span>
-                    <button onClick={() => removeFromCart(product.id)} className="p-1.5 text-muted-foreground hover:text-destructive transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-primary text-sm">{(itemPoints * item.quantity).toLocaleString()} pts</span>
+                      <button onClick={() => removeFromCart(key)} className="p-1.5 text-muted-foreground hover:text-destructive transition-colors">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Summary */}

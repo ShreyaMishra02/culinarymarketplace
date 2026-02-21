@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Minus, Plus, ShoppingCart, AlertTriangle, ArrowLeft, Check } from "lucide-react";
-import { products, categories } from "@/data/mockData";
+import { Minus, Plus, ShoppingCart, AlertTriangle, ArrowLeft, Check, Heart, ChevronDown, ChevronUp, Star, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { products, categories, ProductOption } from "@/data/mockData";
 import { useCart } from "@/context/CartContext";
+import { useFavorites } from "@/context/FavoritesContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const badgeStyles: Record<string, string> = {
   top: "bg-primary text-primary-foreground",
@@ -15,11 +20,121 @@ const badgeStyles: Record<string, string> = {
 };
 const badgeLabels: Record<string, string> = { top: "Top Product", new: "New", discount: "Discount", bestselling: "Best Selling" };
 
+const OptionRow = ({ option, product }: { option: ProductOption; product: typeof products[0] }) => {
+  const [expanded, setExpanded] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [date, setDate] = useState<Date>();
+  const [showModal, setShowModal] = useState(false);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const handleAdd = () => {
+    addToCart(product, qty, option, date ? format(date, "yyyy-MM-dd") : undefined);
+    setShowModal(true);
+  };
+
+  return (
+    <>
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center justify-between p-4 hover:bg-accent/50 transition-colors text-left"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground">{option.title}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0 ml-4">
+            <span className="font-semibold text-primary text-sm">{option.points.toLocaleString()} pts</span>
+            {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          </div>
+        </button>
+        {expanded && (
+          <div className="border-t p-4 bg-muted/30 space-y-3">
+            {option.requiresDate && (
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1.5 block">Select Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full sm:w-[240px] justify-start text-left text-sm font-normal", !date && "text-muted-foreground")}>
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      {date ? format(date, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      disabled={(d) => d < new Date()}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center border rounded-lg bg-card">
+                <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 hover:bg-accent transition-colors rounded-l-lg"><Minus className="h-3.5 w-3.5" /></button>
+                <span className="px-3 text-sm font-medium min-w-[32px] text-center">{qty}</span>
+                <button onClick={() => setQty(qty + 1)} className="p-2 hover:bg-accent transition-colors rounded-r-lg"><Plus className="h-3.5 w-3.5" /></button>
+              </div>
+              <Button onClick={handleAdd} size="sm" className="gap-2" disabled={option.requiresDate && !date}>
+                <ShoppingCart className="h-3.5 w-3.5" />
+                Add – {(option.points * qty).toLocaleString()} pts
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center"><Check className="h-4 w-4 text-success" /></div>
+              Product added to cart
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center gap-3 py-3">
+            <img src={product.image} alt={product.name} className="h-16 w-16 rounded-md object-cover" />
+            <div>
+              <p className="text-sm font-medium">{product.name}</p>
+              <p className="text-xs text-muted-foreground">{option.title}</p>
+              <p className="text-sm text-muted-foreground">Qty: {qty} · {(option.points * qty).toLocaleString()} pts</p>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>Keep Shopping</Button>
+            <Button className="flex-1" onClick={() => { setShowModal(false); navigate("/cart"); }}>Go to Cart</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+const ReviewCard = ({ review }: { review: { author: string; rating: number; date: string; comment: string } }) => (
+  <div className="bg-card border rounded-lg p-4 min-w-[280px] shrink-0">
+    <div className="flex items-center gap-2 mb-2">
+      <div className="flex">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} className={`h-3.5 w-3.5 ${i < review.rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
+        ))}
+      </div>
+      <span className="text-xs text-muted-foreground">{review.date}</span>
+    </div>
+    <p className="text-sm text-foreground mb-1 font-medium">{review.author}</p>
+    <p className="text-sm text-muted-foreground">{review.comment}</p>
+  </div>
+);
+
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const product = products.find(p => p.id === id);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [qty, setQty] = useState(1);
   const [showModal, setShowModal] = useState(false);
 
@@ -33,6 +148,8 @@ const ProductDetail = () => {
   }
 
   const category = categories.find(c => c.id === product.categoryId);
+  const isExperience = product.type === "experience" || product.type === "multi-option";
+  const hasOptions = product.type === "multi-option" && product.options && product.options.length > 0;
 
   const handleAdd = () => {
     addToCart(product, qty);
@@ -59,13 +176,30 @@ const ProductDetail = () => {
       </button>
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* Image */}
-        <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-          {product.badges.length > 0 && (
-            <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-              {product.badges.map(b => (
-                <Badge key={b} className={`${badgeStyles[b]}`}>{badgeLabels[b]}</Badge>
+        {/* Image section */}
+        <div>
+          <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            {product.badges.length > 0 && (
+              <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                {product.badges.map(b => (
+                  <Badge key={b} className={badgeStyles[b]}>{badgeLabels[b]}</Badge>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => toggleFavorite(product.id)}
+              className="absolute top-3 right-3 h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
+            >
+              <Heart className={`h-5 w-5 ${isFavorite(product.id) ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
+            </button>
+          </div>
+
+          {/* Horizontal image gallery for experiences */}
+          {isExperience && product.images && product.images.length > 1 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+              {product.images.map((img, i) => (
+                <img key={i} src={img} alt={`${product.name} ${i + 1}`} className="h-20 w-20 rounded-md object-cover shrink-0 border-2 border-transparent hover:border-primary cursor-pointer transition-colors" />
               ))}
             </div>
           )}
@@ -73,12 +207,18 @@ const ProductDetail = () => {
 
         {/* Info */}
         <div>
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{product.brand}</p>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{product.name}</h1>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{product.brand}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{product.name}</h1>
+            </div>
+          </div>
           <p className="text-sm text-muted-foreground mt-1">Product Code: {product.productCode}</p>
           {product.modelNumber && <p className="text-sm text-muted-foreground">Model: {product.modelNumber}</p>}
 
-          <p className="text-3xl font-bold text-primary mt-4">{product.points.toLocaleString()} pts</p>
+          {!hasOptions && (
+            <p className="text-3xl font-bold text-primary mt-4">{product.points.toLocaleString()} pts</p>
+          )}
 
           {product.alert && (
             <div className="flex items-start gap-2 bg-destructive/10 text-destructive p-3 rounded-lg mt-4 text-sm">
@@ -87,71 +227,121 @@ const ProductDetail = () => {
             </div>
           )}
 
-          <div className="border-t mt-6 pt-6 space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Description</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+          {/* Experience: Overview */}
+          {isExperience && product.overview && (
+            <div className="border-t mt-6 pt-6">
+              <h3 className="text-sm font-semibold text-foreground mb-2">Overview</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{product.overview}</p>
             </div>
+          )}
+
+          {/* Multi-option: Purchasable options */}
+          {hasOptions && (
+            <div className="border-t mt-6 pt-6">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Select an Option</h3>
+              <div className="space-y-2">
+                {product.options!.map(opt => (
+                  <OptionRow key={opt.id} option={opt} product={product} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Experience: Inclusions */}
+          {isExperience && product.inclusions && (
+            <div className="border-t mt-6 pt-6">
+              <h3 className="text-sm font-semibold text-foreground mb-2">What's Included</h3>
+              <ul className="space-y-1.5">
+                {product.inclusions.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Check className="h-3.5 w-3.5 text-success shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Standard info sections */}
+          <div className="border-t mt-6 pt-6 space-y-4">
+            {!isExperience && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Description</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+              </div>
+            )}
+            {isExperience && product.additionalInfo && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Additional Information</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{product.additionalInfo}</p>
+              </div>
+            )}
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-1">Delivery</h3>
               <p className="text-sm text-muted-foreground">{product.deliveryInfo}</p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Cancellation Policy</h3>
-              <p className="text-sm text-muted-foreground">{product.cancellationPolicy}</p>
+              <h3 className="text-sm font-semibold text-foreground mb-1">{isExperience ? "Experience Policies" : "Cancellation Policy"}</h3>
+              <p className="text-sm text-muted-foreground">{isExperience && product.experiencePolicies ? product.experiencePolicies : product.cancellationPolicy}</p>
             </div>
           </div>
 
-          <div className="border-t mt-6 pt-6">
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-sm font-medium text-foreground">Quantity</span>
-              <div className="flex items-center border rounded-lg">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 hover:bg-accent transition-colors rounded-l-lg">
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="px-4 text-sm font-medium min-w-[40px] text-center">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="p-2 hover:bg-accent transition-colors rounded-r-lg">
-                  <Plus className="h-4 w-4" />
-                </button>
+          {/* Standard product: quantity + add to cart */}
+          {!hasOptions && (
+            <div className="border-t mt-6 pt-6">
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-sm font-medium text-foreground">Quantity</span>
+                <div className="flex items-center border rounded-lg">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 hover:bg-accent transition-colors rounded-l-lg"><Minus className="h-4 w-4" /></button>
+                  <span className="px-4 text-sm font-medium min-w-[40px] text-center">{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} className="p-2 hover:bg-accent transition-colors rounded-r-lg"><Plus className="h-4 w-4" /></button>
+                </div>
               </div>
+              <Button onClick={handleAdd} className="w-full h-12 rounded-lg text-sm font-medium gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Add to Cart – {(product.points * qty).toLocaleString()} pts
+              </Button>
             </div>
-
-            <Button onClick={handleAdd} className="w-full h-12 rounded-lg text-sm font-medium gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Add to Cart – {(product.points * qty).toLocaleString()} pts
-            </Button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Added to cart modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center">
-                <Check className="h-4 w-4 text-success" />
+      {/* Reviews for experience products */}
+      {isExperience && product.reviews && product.reviews.length > 0 && (
+        <div className="border-t mt-10 pt-8">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Reviews</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {product.reviews.map((review, i) => (
+              <ReviewCard key={i} review={review} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Standard added-to-cart modal */}
+      {!hasOptions && (
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center"><Check className="h-4 w-4 text-success" /></div>
+                Product added to cart
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex items-center gap-3 py-3">
+              <img src={product.image} alt={product.name} className="h-16 w-16 rounded-md object-cover" />
+              <div>
+                <p className="text-sm font-medium">{product.name}</p>
+                <p className="text-sm text-muted-foreground">Qty: {qty} · {(product.points * qty).toLocaleString()} pts</p>
               </div>
-              Product added to cart
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex items-center gap-3 py-3">
-            <img src={product.image} alt={product.name} className="h-16 w-16 rounded-md object-cover" />
-            <div>
-              <p className="text-sm font-medium">{product.name}</p>
-              <p className="text-sm text-muted-foreground">Qty: {qty} · {(product.points * qty).toLocaleString()} pts</p>
             </div>
-          </div>
-          <div className="flex gap-3 mt-2">
-            <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>
-              Keep Shopping
-            </Button>
-            <Button className="flex-1" onClick={() => { setShowModal(false); navigate("/cart"); }}>
-              Go to Cart
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            <div className="flex gap-3 mt-2">
+              <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>Keep Shopping</Button>
+              <Button className="flex-1" onClick={() => { setShowModal(false); navigate("/cart"); }}>Go to Cart</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
