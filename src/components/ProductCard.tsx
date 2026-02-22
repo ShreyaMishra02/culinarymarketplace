@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
-import { Product } from "@/data/mockData";
+import { Product, BadgeType } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { useFavorites } from "@/context/FavoritesContext";
 
-const badgeLabels: Record<string, { label: string; className: string }> = {
-  top: { label: "Top Product", className: "bg-primary text-primary-foreground" },
-  new: { label: "New", className: "bg-success text-success-foreground" },
+const badgeLabels: Record<BadgeType, { label: string; className: string }> = {
+  bestseller: { label: "Best Seller", className: "bg-foreground text-background" },
+  featured: { label: "Featured", className: "bg-primary text-primary-foreground" },
+  new: { label: "New Product", className: "bg-success text-success-foreground" },
   discount: { label: "Discount", className: "bg-destructive text-destructive-foreground" },
-  bestselling: { label: "Best Selling", className: "bg-foreground text-background" },
+  "great-deals": { label: "Great Deals", className: "bg-[hsl(38,92%,50%)] text-secondary" },
 };
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -19,7 +20,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   const hasOptions = product.options && product.options.length > 0;
 
   return (
-    <div className="group relative block bg-card rounded-lg border overflow-hidden card-shadow hover:card-shadow-hover transition-all duration-300 hover:-translate-y-1">
+    <div className="group relative block bg-card rounded-xl border overflow-hidden card-shadow hover:card-shadow-hover transition-all duration-300 hover:-translate-y-1 hover:border-primary">
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(product.id); }}
         className="absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
@@ -37,8 +38,8 @@ const ProductCard = ({ product }: { product: Product }) => {
           {product.badges.length > 0 && (
             <div className="absolute top-2 left-2 flex flex-wrap gap-1">
               {product.badges.map(b => (
-                <Badge key={b} className={`text-[10px] px-1.5 py-0.5 ${badgeLabels[b].className}`}>
-                  {badgeLabels[b].label}
+                <Badge key={b} className={`text-[10px] px-1.5 py-0.5 ${badgeLabels[b]?.className || ""}`}>
+                  {badgeLabels[b]?.label || b}
                 </Badge>
               ))}
             </div>

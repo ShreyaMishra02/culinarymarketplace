@@ -86,14 +86,11 @@ const CartPage = () => {
                 <span>Subtotal</span>
                 <span>{totalPoints.toLocaleString()} pts</span>
               </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Tax & Shipping</span>
-                <span>Included</span>
-              </div>
               <div className="border-t pt-3 flex justify-between font-semibold text-foreground">
                 <span>Total</span>
                 <span>{totalPoints.toLocaleString()} pts</span>
               </div>
+              <p className="text-xs text-muted-foreground mt-1">(Including applicable taxes)</p>
             </div>
             <p className="text-xs text-muted-foreground mt-3">
               Your balance: {userPoints.toLocaleString()} pts · Remaining: {(userPoints - totalPoints).toLocaleString()} pts
