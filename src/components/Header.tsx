@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, HelpCircle, ClipboardList, Star, Menu, X, Heart } from "lucide-react";
+import { ShoppingCart, HelpCircle, ClipboardList, Star, Menu, X, Heart, MapPin, LogOut, Globe, ChevronDown } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { categories } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -21,7 +23,6 @@ const Header = () => {
 
   useEffect(() => setMobileOpen(false), [location]);
 
-  // Visible categories (hide grocery by default unless entitled)
   const visibleCategories = categories.filter(c => !c.hidden);
 
   return (
@@ -34,11 +35,12 @@ const Header = () => {
       >
         <div className="container-main flex items-center justify-between">
           {/* Left: Logo */}
-          <Link to="/" className="flex items-center gap-2 font-semibold text-lg text-foreground shrink-0">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-sm font-bold">CM</span>
-            </div>
-            <span className="hidden sm:inline">Culinary Market</span>
+          <Link to="/" className="flex items-center shrink-0">
+            <img
+              src={logo}
+              alt="BI Worldwide Culinary Marketplace"
+              className={`transition-all duration-200 ${scrolled ? "h-8" : "h-10"} md:h-10 w-auto`}
+            />
           </Link>
 
           {/* Center: Nav (desktop) */}
@@ -60,6 +62,15 @@ const Header = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language selector */}
+            <div className="hidden sm:flex items-center gap-1 text-sm text-muted-foreground">
+              <Globe className="h-3.5 w-3.5" />
+              <span>EN</span>
+              <ChevronDown className="h-3 w-3" />
+            </div>
+
+            <span className="hidden sm:inline text-sm font-medium text-foreground">John</span>
+
             <Link to="#" className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               <Star className="h-4 w-4 text-primary" />
               <span>{userPoints.toLocaleString()} pts</span>
@@ -92,6 +103,11 @@ const Header = () => {
                 </Badge>
               )}
             </Link>
+
+            <button className="hidden sm:flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <LogOut className="h-4 w-4" />
+              <span className="hidden md:inline">Logout</span>
+            </button>
 
             <button
               className="lg:hidden p-2 rounded-md hover:bg-accent transition-colors"
@@ -128,13 +144,37 @@ const Header = () => {
                 <div className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground">
                   <Star className="h-4 w-4 text-primary" /> {userPoints.toLocaleString()} points
                 </div>
+                <button className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground w-full">
+                  <LogOut className="h-4 w-4" /> Logout
+                </button>
               </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Sticky category navigation bar – visible on home and category pages */}
+      {/* Address indicator strip */}
+      <div className="bg-[hsl(217,100%,95%)] border-b border-[hsl(217,100%,85%)]">
+        <div className="container-main flex items-center justify-between h-10">
+          <div className="flex items-center gap-2 text-sm">
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+            <span className="text-primary font-medium">Selected Address:</span>
+            <span className="text-primary">555 West Branch Rd</span>
+          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="text-sm text-muted-foreground/60 cursor-not-allowed">
+                Change
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-[240px] text-xs">Address cannot be changed once selected because it determines pricing and availability.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+
+      {/* Sticky category navigation bar */}
       {(location.pathname === "/" || location.pathname.startsWith("/category")) && (
         <div className={`sticky z-40 border-b bg-secondary/95 backdrop-blur-sm transition-all duration-200 ${scrolled ? "top-[52px]" : "top-[64px]"}`}>
           <div className="container-main">
