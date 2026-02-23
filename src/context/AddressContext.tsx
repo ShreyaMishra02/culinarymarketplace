@@ -16,7 +16,6 @@ export interface SavedAddress {
 interface AddressContextType {
   address: SavedAddress | null;
   isAddressSaved: boolean;
-  showAddressModal: boolean;
   saveAddress: (addr: SavedAddress) => void;
 }
 
@@ -24,15 +23,13 @@ const AddressContext = createContext<AddressContextType | undefined>(undefined);
 
 export const AddressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [address, setAddress] = useState<SavedAddress | null>(null);
-  const [showAddressModal, setShowAddressModal] = useState(true);
 
   const saveAddress = useCallback((addr: SavedAddress) => {
     setAddress(addr);
-    setShowAddressModal(false);
   }, []);
 
   return (
-    <AddressContext.Provider value={{ address, isAddressSaved: !!address, showAddressModal, saveAddress }}>
+    <AddressContext.Provider value={{ address, isAddressSaved: !!address, saveAddress }}>
       {children}
     </AddressContext.Provider>
   );
