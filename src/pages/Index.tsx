@@ -9,11 +9,11 @@ const visibleCategories = categories.filter(c => !c.hidden);
 const restaurantProducts = products.filter(p => p.categoryId === "restaurants").slice(0, 6);
 
 const shortcuts = [
-  { label: "Beverages", icon: Wine, slug: "beverages" },
   { label: "Restaurants", icon: Utensils, slug: "restaurants" },
-  { label: "Order In", icon: Truck, slug: "order-in" },
+  { label: "Meal Delivery", icon: Truck, slug: "order-in" },
   { label: "Meal Kits", icon: ChefHat, slug: "meal-kits" },
-  { label: "Goodies", icon: Gift, slug: "goodies" },
+  { label: "Specialty Foods", icon: Gift, slug: "goodies" },
+  { label: "Beverages", icon: Wine, slug: "beverages" },
 ];
 
 const Index = () => {
@@ -65,6 +65,7 @@ const Index = () => {
             </div>
           ))}
         </div>
+        {/* Mobile: horizontal scroll alternative */}
       </section>
 
       {/* Popular Restaurants */}
