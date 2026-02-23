@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart, getCartItemKey } from "@/context/CartContext";
+import { useAddress } from "@/context/AddressContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, Info, MapPin } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Check, Info } from "lucide-react";
 
 const steps = ["Address", "Contact", "Review"];
 
@@ -15,44 +15,13 @@ const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
   const { items, totalPoints, clearCart } = useCart();
+  const { address } = useAddress();
   const navigate = useNavigate();
-
-  // Address form state
-  const [addressForm, setAddressForm] = useState({
-    country: "United States",
-    addressType: "residential" as "residential" | "business",
-    firstName: "John",
-    lastName: "Doe",
-    address1: "555 West Branch Rd",
-    address2: "",
-    city: "New York",
-    state: "NY",
-    zip: "10001",
-    nickname: "Home",
-  });
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [showLoqateModal, setShowLoqateModal] = useState(false);
-  const [addressSaved, setAddressSaved] = useState(true);
-
-  const updateField = (field: string, value: string) => {
-    setAddressForm(prev => ({ ...prev, [field]: value }));
-  };
 
   if (items.length === 0) {
     navigate("/cart");
     return null;
   }
-
-  const handleSaveAddress = () => {
-    // Simulate Loqate validation
-    setShowLoqateModal(true);
-  };
-
-  const handleAcceptAddress = () => {
-    setShowLoqateModal(false);
-    setShowAddressForm(false);
-    setAddressSaved(true);
-  };
 
   const handlePlaceOrder = () => {
     clearCart();
@@ -83,113 +52,27 @@ const CheckoutPage = () => {
       </div>
 
       <div className="bg-card border rounded-xl p-6 sm:p-8">
-        {step === 0 && !showAddressForm && (
+        {step === 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-4">Delivery Address</h2>
-            <div className="bg-muted rounded-lg p-4 text-sm space-y-1">
-              <p className="font-medium">{addressForm.firstName} {addressForm.lastName}</p>
-              <p className="text-muted-foreground">{addressForm.address1}</p>
-              {addressForm.address2 && <p className="text-muted-foreground">{addressForm.address2}</p>}
-              <p className="text-muted-foreground">{addressForm.city}, {addressForm.state} {addressForm.zip}</p>
-              <p className="text-muted-foreground">{addressForm.country}</p>
-              {addressForm.nickname && (
-                <p className="text-xs text-primary mt-1">📌 {addressForm.nickname}</p>
-              )}
-            </div>
-            <div className="flex gap-3 mt-4">
-              <Button variant="outline" size="sm" onClick={() => setShowAddressForm(true)}>
-                <MapPin className="h-3.5 w-3.5 mr-1" /> Edit Address
-              </Button>
-            </div>
+            {address ? (
+              <div className="bg-muted rounded-lg p-4 text-sm space-y-1">
+                <p className="font-medium">{address.firstName} {address.lastName}</p>
+                <p className="text-muted-foreground">{address.address1}</p>
+                {address.address2 && <p className="text-muted-foreground">{address.address2}</p>}
+                <p className="text-muted-foreground">{address.city}, {address.state} {address.zip}</p>
+                <p className="text-muted-foreground">{address.country}</p>
+                {address.nickname && (
+                  <p className="text-xs text-primary mt-1">📌 {address.nickname}</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No address saved. Please complete address setup first.</p>
+            )}
             <p className="text-xs text-muted-foreground mt-3">
-              Once confirmed, address cannot be changed during checkout as it determines pricing and availability.
+              Address is locked and cannot be changed during checkout as it determines pricing and availability.
             </p>
             <Button className="mt-6 w-full h-11 rounded-lg" onClick={() => setStep(1)}>Continue</Button>
-          </div>
-        )}
-
-        {step === 0 && showAddressForm && (
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Delivery Address</h2>
-            <div className="space-y-4">
-              {/* Country */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Country *</label>
-                <select
-                  value={addressForm.country}
-                  onChange={e => updateField("country", e.target.value)}
-                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>United Kingdom</option>
-                </select>
-              </div>
-
-              {/* Address Type */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Address Type</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <input type="radio" name="addrType" checked={addressForm.addressType === "residential"} onChange={() => updateField("addressType", "residential")} className="accent-[hsl(var(--primary))]" />
-                    Residential
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <input type="radio" name="addrType" checked={addressForm.addressType === "business"} onChange={() => updateField("addressType", "business")} className="accent-[hsl(var(--primary))]" />
-                    Business
-                  </label>
-                </div>
-              </div>
-
-              {/* Name */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">First Name *</label>
-                  <Input value={addressForm.firstName} onChange={e => updateField("firstName", e.target.value)} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Last Name *</label>
-                  <Input value={addressForm.lastName} onChange={e => updateField("lastName", e.target.value)} />
-                </div>
-              </div>
-
-              {/* Address Lines */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Address (No P.O. Boxes) *</label>
-                <Input value={addressForm.address1} onChange={e => updateField("address1", e.target.value)} />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Apartment Number, Suite, Floor</label>
-                <Input value={addressForm.address2} onChange={e => updateField("address2", e.target.value)} placeholder="Optional" />
-              </div>
-
-              {/* City, State, Zip */}
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">City *</label>
-                  <Input value={addressForm.city} onChange={e => updateField("city", e.target.value)} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">State *</label>
-                  <Input value={addressForm.state} onChange={e => updateField("state", e.target.value)} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Zip Code *</label>
-                  <Input value={addressForm.zip} onChange={e => updateField("zip", e.target.value)} />
-                </div>
-              </div>
-
-              {/* Nickname */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Nickname for Address *</label>
-                <Input value={addressForm.nickname} onChange={e => updateField("nickname", e.target.value)} placeholder="Home, Office, Parents House" />
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <Button variant="outline" className="flex-1 h-11 rounded-lg" onClick={() => setShowAddressForm(false)}>Cancel</Button>
-              <Button className="flex-1 h-11 rounded-lg" onClick={handleSaveAddress}>Save and Continue</Button>
-            </div>
           </div>
         )}
 
@@ -244,7 +127,7 @@ const CheckoutPage = () => {
               </div>
               <p className="text-xs text-muted-foreground mb-3">(Including applicable taxes)</p>
               <div className="bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1 mb-4">
-                <p><strong>Address:</strong> {addressForm.address1}, {addressForm.city}, {addressForm.state} {addressForm.zip}</p>
+                <p><strong>Address:</strong> {address ? `${address.address1}, ${address.city}, ${address.state} ${address.zip}` : "N/A"}</p>
                 <p><strong>Contact:</strong> {contactEmail || "john.doe@company.com"} · {phone || "Not provided"}</p>
               </div>
             </div>
@@ -263,27 +146,6 @@ const CheckoutPage = () => {
           </div>
         )}
       </div>
-
-      {/* Loqate Validation Modal */}
-      <Dialog open={showLoqateModal} onOpenChange={setShowLoqateModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Did you mean this address?</DialogTitle>
-          </DialogHeader>
-          <div className="py-3 space-y-3">
-            <div className="bg-muted rounded-lg p-3 text-sm">
-              <p className="font-medium">Suggested Address:</p>
-              <p className="text-muted-foreground">{addressForm.address1}</p>
-              <p className="text-muted-foreground">{addressForm.city}, {addressForm.state} {addressForm.zip}</p>
-              <p className="text-muted-foreground">{addressForm.country}</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={handleAcceptAddress}>Keep My Entered Address</Button>
-            <Button className="flex-1" onClick={handleAcceptAddress}>Use Suggested Address</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
