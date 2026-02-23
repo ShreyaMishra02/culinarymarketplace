@@ -19,12 +19,12 @@ const emptyAddress: SavedAddress = {
 };
 
 const AddressModal = () => {
-  const { isAddressSaved, saveAddress } = useAddress();
+  const { showAddressModal, saveAddress } = useAddress();
   const [form, setForm] = useState<SavedAddress>(emptyAddress);
   const [showLoqate, setShowLoqate] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
-  if (isAddressSaved) return null;
+  if (!showAddressModal) return null;
 
   const update = (field: keyof SavedAddress, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));

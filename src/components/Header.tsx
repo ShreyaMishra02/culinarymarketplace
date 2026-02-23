@@ -27,9 +27,8 @@ const Header = () => {
 
   const visibleCategories = categories.filter(c => !c.hidden);
 
-  const addressDisplay = isAddressSaved && address
-    ? `${address.address1}, ${address.city}, ${address.state} ${address.zip}`
-    : null;
+  const addressLine1 = isAddressSaved && address ? address.address1 : null;
+  const addressLine2 = isAddressSaved && address ? `${address.city}, ${address.state} ${address.zip}` : null;
 
   return (
     <>
@@ -49,10 +48,13 @@ const Header = () => {
                 className={`transition-all duration-200 ${scrolled ? "h-10" : "h-12"} md:h-14 w-auto`}
               />
             </Link>
-            {addressDisplay && (
-              <div className="hidden md:flex items-center gap-1.5 text-sm text-foreground max-w-[220px]">
-                <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span className="truncate font-medium">{addressDisplay}</span>
+            {addressLine1 && (
+              <div className="hidden md:flex flex-col text-sm text-foreground max-w-[220px]">
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span className="truncate font-medium">{addressLine1}</span>
+                </div>
+                <span className="truncate text-xs text-muted-foreground ml-5">{addressLine2}</span>
               </div>
             )}
           </div>
@@ -137,9 +139,9 @@ const Header = () => {
         {mobileOpen && (
           <div className="lg:hidden border-t bg-secondary animate-fade-in">
             <div className="container-main py-3 space-y-1">
-              {addressDisplay && (
+              {addressLine1 && (
                 <div className="flex items-center gap-2 px-3 py-2.5 text-sm text-foreground md:hidden">
-                  <MapPin className="h-4 w-4 text-primary" /> {addressDisplay}
+                  <MapPin className="h-4 w-4 text-primary" /> {addressLine1}, {addressLine2}
                 </div>
               )}
               {visibleCategories.map(c => (
