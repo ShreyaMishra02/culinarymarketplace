@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Utensils, Truck, ChefHat, Gift, Wine } from "lucide-react";
+import { ArrowRight, Utensils, Truck, ChefHat, Gift, Wine, ShoppingBasket, UtensilsCrossed, Cookie } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { categories, products, deliveryApps } from "@/data/mockData";
 import { useCart } from "@/context/CartContext";
@@ -14,6 +14,7 @@ const shortcuts = [
   { label: "Order In", icon: Truck, slug: "order-in" },
   { label: "Meal Kits", icon: ChefHat, slug: "meal-kits" },
   { label: "Goodies", icon: Gift, slug: "goodies" },
+  { label: "Grocery", icon: ShoppingBasket, slug: "grocery" },
 ];
 
 const Index = () => {

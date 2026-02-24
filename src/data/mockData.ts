@@ -4,6 +4,12 @@ import catMealkits from "@/assets/cat-mealkits.jpg";
 import catOrderin from "@/assets/cat-orderin.jpg";
 import catGoodies from "@/assets/cat-goodies.jpg";
 import catGrocery from "@/assets/cat-grocery.jpg";
+import grocProduce from "@/assets/groc-produce.jpg";
+import grocBakery from "@/assets/groc-bakery.jpg";
+import grocPasta from "@/assets/groc-pasta.jpg";
+import grocGranola from "@/assets/groc-granola.jpg";
+import grocCheese from "@/assets/groc-cheese.jpg";
+import grocSpices from "@/assets/groc-spices.jpg";
 import deliveryDoordash from "@/assets/delivery-doordash.jpg";
 import deliveryGrubhub from "@/assets/delivery-grubhub.jpg";
 import deliveryUbereats from "@/assets/delivery-ubereats.jpg";
@@ -110,7 +116,7 @@ export const categories: Category[] = [
   { id: "goodies", name: "Goodies", slug: "goodies", image: catGoodies, subcategories: [
     { name: "Snacks" }, { name: "Treats" }, { name: "Edible Gifts" }
   ]},
-  { id: "grocery", name: "Grocery", slug: "grocery", image: catGrocery, subcategories: [], hidden: true },
+  { id: "grocery", name: "Grocery", slug: "grocery", image: catGrocery, subcategories: [] },
 ];
 
 export const deliveryApps: DeliveryApp[] = [
@@ -240,8 +246,12 @@ export const products: Product[] = [
   { id: "good-3", name: "Gourmet Snack Basket", brand: "SnackCrate", categoryId: "goodies", subcategory: "Edible Gifts", points: 2500, image: catGoodies, description: "A premium gift basket with artisan snacks from around the world.", productCode: "BIW-5003", deliveryInfo: "Ships within 3-5 business days", cancellationPolicy: "Free cancellation within 24 hours", badges: ["great-deals"] },
 
   // Grocery
-  { id: "groc-1", name: "Organic Produce Box", brand: "FarmFresh", categoryId: "grocery", subcategory: "Grocery", points: 2800, image: catGrocery, description: "Weekly box of seasonal organic fruits and vegetables.", productCode: "BIW-6001", deliveryInfo: "Ships within 1-2 business days", cancellationPolicy: "Free cancellation within 12 hours", badges: ["featured"] },
-  { id: "groc-2", name: "Artisan Bakery Bundle", brand: "Golden Crust", categoryId: "grocery", subcategory: "Grocery", points: 1200, image: catGrocery, description: "Sourdough loaf, croissants, and baguette.", productCode: "BIW-6002", deliveryInfo: "Ships within 1-2 business days", cancellationPolicy: "Non-refundable", badges: ["new", "discount"] },
+  { id: "groc-1", name: "Organic Produce Box", brand: "FarmFresh", categoryId: "grocery", subcategory: "Grocery", points: 2800, image: grocProduce, description: "Weekly box of seasonal organic fruits and vegetables.", productCode: "BIW-6001", deliveryInfo: "Ships within 1-2 business days", cancellationPolicy: "Free cancellation within 12 hours", badges: ["featured"] },
+  { id: "groc-2", name: "Artisan Bakery Bundle", brand: "Golden Crust", categoryId: "grocery", subcategory: "Grocery", points: 1200, image: grocBakery, description: "Sourdough loaf, croissants, and baguette.", productCode: "BIW-6002", deliveryInfo: "Ships within 1-2 business days", cancellationPolicy: "Non-refundable", badges: ["new", "discount"] },
+  { id: "groc-3", name: "Italian Pasta & Olive Oil Set", brand: "Tuscany Imports", categoryId: "grocery", subcategory: "Grocery", points: 2200, image: grocPasta, description: "Premium imported Italian pasta and extra virgin olive oil gift set.", productCode: "BIW-6003", deliveryInfo: "Ships within 3-5 business days", cancellationPolicy: "Free cancellation within 24 hours", badges: ["bestseller", "featured"] },
+  { id: "groc-4", name: "Crunchy Granola Mix", brand: "NatureVale", categoryId: "grocery", subcategory: "Grocery", points: 900, image: grocGranola, description: "Healthy granola with almonds, dried berries, and honey clusters.", productCode: "BIW-6004", deliveryInfo: "Ships within 2-4 business days", cancellationPolicy: "Free cancellation within 24 hours", badges: ["new", "great-deals"] },
+  { id: "groc-5", name: "Gourmet Cheese & Charcuterie Board", brand: "Fromage & Co", categoryId: "grocery", subcategory: "Grocery", points: 4200, image: grocCheese, description: "Curated selection of artisan cheeses and premium cured meats.", productCode: "BIW-6005", deliveryInfo: "Ships within 1-2 business days", cancellationPolicy: "Non-refundable", badges: ["featured", "bestseller"] },
+  { id: "groc-6", name: "Organic Spice Collection", brand: "SpiceTrail", categoryId: "grocery", subcategory: "Grocery", points: 1600, image: grocSpices, description: "12 organic spices and seasonings from around the world.", productCode: "BIW-6006", deliveryInfo: "Ships within 3-5 business days", cancellationPolicy: "Free cancellation within 24 hours", badges: ["new"] },
 ];
 
 export const sampleOrders: Order[] = [

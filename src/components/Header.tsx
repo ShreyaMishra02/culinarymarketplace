@@ -14,8 +14,9 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems, userPoints } = useCart();
   const { favorites } = useFavorites();
-  const { address, isAddressSaved } = useAddress();
+  const { address, isAddressSaved, openAddressModal } = useAddress();
   const location = useLocation();
+  const isCheckout = location.pathname === "/checkout";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -45,17 +46,22 @@ const Header = () => {
               <img
                 src={logo}
                 alt="BI Worldwide Culinary Marketplace"
-                className={`transition-all duration-200 ${scrolled ? "h-12" : "h-[65px]"} md:h-[70px] w-auto`}
+                className={`transition-all duration-200 ${scrolled ? "h-14" : "h-[75px]"} md:h-[80px] w-auto`}
               />
             </Link>
             {addressLine1 && (
-              <div className="hidden md:flex flex-col text-sm text-foreground max-w-[220px]">
+              <button
+                onClick={!isCheckout ? openAddressModal : undefined}
+                disabled={isCheckout}
+                className={`hidden md:flex flex-col text-sm text-foreground max-w-[220px] text-left ${!isCheckout ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed"}`}
+              >
                 <div className="flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
                   <span className="truncate font-medium">{addressLine1}</span>
+                  {!isCheckout && <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />}
                 </div>
                 <span className="truncate text-xs text-muted-foreground ml-5">{addressLine2}</span>
-              </div>
+              </button>
             )}
           </div>
 
@@ -150,9 +156,14 @@ const Header = () => {
           <div className="lg:hidden border-t bg-secondary animate-fade-in">
             <div className="container-main py-3 space-y-1">
               {addressLine1 && (
-                <div className="flex items-center gap-2 px-3 py-2.5 text-sm text-foreground md:hidden">
+                <button
+                  onClick={!isCheckout ? openAddressModal : undefined}
+                  disabled={isCheckout}
+                  className="flex items-center gap-2 px-3 py-2.5 text-sm text-foreground md:hidden w-full text-left"
+                >
                   <MapPin className="h-4 w-4 text-primary" /> {addressLine1}, {addressLine2}
-                </div>
+                  {!isCheckout && <ChevronDown className="h-3 w-3 text-muted-foreground ml-auto" />}
+                </button>
               )}
               <Link to="/" className="block px-3 py-2.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">Home</Link>
               {visibleCategories.map(c => (
@@ -190,29 +201,6 @@ const Header = () => {
           </div>
         )}
       </header>
-
-      {/* Address indicator strip - only show when address is saved */}
-      {isAddressSaved && address && (
-        <div className="bg-[hsl(217,100%,95%)] border-b border-[hsl(217,100%,85%)]">
-          <div className="container-main flex items-center justify-between h-10">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-3.5 w-3.5 text-primary" />
-              <span className="text-primary font-medium">Selected Address:</span>
-              <span className="text-primary">{address.address1}</span>
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="text-sm text-muted-foreground/60 cursor-not-allowed">
-                  Change
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-[240px] text-xs">Address cannot be changed once selected because it determines pricing and availability.</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-      )}
 
       {/* Sticky category navigation bar */}
       {(location.pathname === "/" || location.pathname.startsWith("/category")) && (
