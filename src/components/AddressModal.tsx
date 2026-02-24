@@ -55,8 +55,8 @@ const AddressModal = () => {
   return (
     <>
       {/* Full-screen uncloseable modal */}
-      <div className="fixed inset-0 z-[100] bg-foreground/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div className="bg-card rounded-xl shadow-2xl w-full max-w-[800px] my-8">
+      <div className="fixed inset-0 z-[100] bg-foreground/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-card rounded-xl shadow-2xl w-full max-w-[750px] my-10 sm:my-8">
           <div className="p-6 sm:p-8">
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="h-5 w-5 text-primary" />

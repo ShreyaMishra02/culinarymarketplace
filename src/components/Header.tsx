@@ -41,11 +41,11 @@ const Header = () => {
         <div className="container-main flex items-center justify-between">
           {/* Left: Logo + Address */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link to="/" className="flex items-center shrink-0 pl-0">
+            <Link to="/" className="flex items-center shrink-0 pl-4 md:pl-6">
               <img
                 src={logo}
                 alt="BI Worldwide Culinary Marketplace"
-                className={`transition-all duration-200 ${scrolled ? "h-10" : "h-12"} md:h-14 w-auto`}
+                className={`transition-all duration-200 ${scrolled ? "h-12" : "h-[65px]"} md:h-[70px] w-auto`}
               />
             </Link>
             {addressLine1 && (
@@ -61,6 +61,16 @@ const Header = () => {
 
           {/* Center: Nav (desktop) */}
           <nav className="hidden lg:flex items-center gap-1">
+            <Link
+              to="/"
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                location.pathname === "/"
+                  ? "text-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
+              }`}
+            >
+              Home
+            </Link>
             {visibleCategories.map(c => (
               <Link
                 key={c.slug}
@@ -144,6 +154,7 @@ const Header = () => {
                   <MapPin className="h-4 w-4 text-primary" /> {addressLine1}, {addressLine2}
                 </div>
               )}
+              <Link to="/" className="block px-3 py-2.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">Home</Link>
               {visibleCategories.map(c => (
                 <Link
                   key={c.slug}
@@ -208,6 +219,16 @@ const Header = () => {
         <div className={`sticky z-40 border-b bg-secondary/95 backdrop-blur-sm transition-all duration-200 ${scrolled ? "top-[52px]" : "top-[64px]"}`}>
           <div className="container-main">
             <nav className="flex items-center gap-1 overflow-x-auto py-2 scrollbar-hide">
+              <Link
+                to="/"
+                className={`shrink-0 px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${
+                  location.pathname === "/"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                Home
+              </Link>
               {visibleCategories.map(c => (
                 <Link
                   key={c.slug}
