@@ -18,9 +18,14 @@ const emptyAddress: SavedAddress = {
 };
 
 const AddressModal = () => {
-  const { showAddressModal, saveAddress } = useAddress();
-  const [form, setForm] = useState<SavedAddress>(emptyAddress);
+  const { showAddressModal, saveAddress, address } = useAddress();
+  const [form, setForm] = useState<SavedAddress>(address || emptyAddress);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+
+  // Pre-fill when modal reopens with existing address
+  useState(() => {
+    if (address) setForm(address);
+  });
 
   if (!showAddressModal) return null;
 
