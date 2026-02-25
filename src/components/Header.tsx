@@ -36,17 +36,17 @@ const Header = () => {
       {/* Main header */}
       <header
         className={`sticky top-0 z-50 border-b bg-secondary transition-all duration-200 ${
-          scrolled ? "py-1.5" : "py-3"
+          scrolled ? "py-1" : "py-2"
         }`}
       >
         <div className="container-main flex items-center justify-between">
           {/* Left: Logo + Address */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link to="/" className="flex items-center shrink-0 pl-4 md:pl-6">
+            <Link to="/" className="flex items-center shrink-0">
               <img
                 src={logo}
                 alt="BI Worldwide Culinary Marketplace"
-                className={`transition-all duration-200 ${scrolled ? "h-14" : "h-[75px]"} md:h-[80px] w-auto`}
+                className={`transition-all duration-200 ${scrolled ? "h-[60px]" : "h-[80px]"} md:${scrolled ? "h-[70px]" : "h-[90px]"} w-auto`}
               />
             </Link>
             {addressLine1 && (
@@ -204,7 +204,7 @@ const Header = () => {
 
       {/* Sticky category navigation bar */}
       {(location.pathname === "/" || location.pathname.startsWith("/category")) && (
-        <div className={`sticky z-40 border-b bg-secondary/95 backdrop-blur-sm transition-all duration-200 ${scrolled ? "top-[52px]" : "top-[64px]"}`}>
+        <div className={`sticky z-40 border-b bg-secondary/95 backdrop-blur-sm shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-200 ${scrolled ? "top-[60px]" : "top-[88px]"}`}>
           <div className="container-main">
             <nav className="flex items-center gap-1 overflow-x-auto py-2 scrollbar-hide">
               <Link
